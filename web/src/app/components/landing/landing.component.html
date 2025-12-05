@@ -1,0 +1,38 @@
+<div>
+    @if (articlesQuery.isLoading()) {
+      <div>Loading articles...</div>
+    }
+
+    @if (articlesQuery.error()) {
+      <div>Error displaying articles</div>
+    }
+
+    @for (article of articlesQuery.data(); track article.id) {
+        <div class="article">
+          <div class="article-title">{{article.pubmed_id}}</div>
+          <div class="button">
+            <button (click)="selectArticleId(article.pubmed_id)">View article abstract</button>
+          </div>
+        </div>
+    }
+
+
+    @if (selectedPubMedId()) {
+
+      @if (abstractQuery.isLoading()) {
+      <div>Loading article abstract</div>
+      }
+
+      @if (abstractQuery.data()) {
+        <div>Abstract</div>
+        <div>
+          {{ abstractQuery.data() }}
+        </div>
+      }
+
+      @if (abstractQuery.error()) {
+        <div>Error displaying abstract</div>
+      }
+    }
+
+</div>

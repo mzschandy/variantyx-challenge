@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import axios from 'axios'
-import { Article } from '../../../../shared/article';
+import { Article } from '../../../../../shared/article';
 
 export interface Abstract {
   abstract: string;

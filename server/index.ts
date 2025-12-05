@@ -3,6 +3,9 @@ import axios from "axios";
 import * as cheerio from 'cheerio'; 
 import * as db from '../db/index.ts'
 import cors from 'cors';
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({});
 
 const PORT = 3000
 const BASE_EXTRACTION_URL = 'https://pubmed.ncbi.nlm.nih.gov'
@@ -10,6 +13,7 @@ const BASE_EXTRACTION_URL = 'https://pubmed.ncbi.nlm.nih.gov'
 const app = express();
 
 app.use(cors())
+app.use(express.json());
 
 app.get('/api/health', (req, res) => res.send('HAAAAAAA'));
 
@@ -59,6 +63,51 @@ app.get('/api/articles/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch abstract' });
   }
 })
+
+app.post('/api/gemini/ask', async (req, res) => {
+  // const response = await ai.models.generateContent({
+  //   model: "gemini-2.5-flash",
+  //   contents: "How does AI work?",
+  // });
+  // console.log(response.text);
+console.log('req body', req.body)
+  const { abstract, question } = req.body;
+
+  
+  
+  if (!abstract || !question) return res.status(400).json({ error: 'Missing data' });
+  console.log('abstract is >>', abstract)
+  console.log('quesiton is >>', question)
+  try {
+    const answer = await askGemini(abstract, question);
+    res.json({ answer });
+  } catch (err) {
+    res.status(500).json({ error: 'AI Service Unavailable' });
+  }
+})
+
+export const askGemini = async (abstract: string, question: string) => {
+  console.log("activating ask gemini")
+  const prompt = `
+    You are a medical researcher skilled in answering questions in a way that a non-scientist would understand.
+    While explaining, make sure to explain concepts in a way a layperson would understand. Do not assume the
+    user is familiar with the scientific concepts in the abstract.
+
+    Return text only, if there are non data parts ignore them.
+      
+    Abstract: "${abstract}"
+    
+    Question: "${question}"
+  `;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
+  console.log('gemini response text >>', response.text)
+
+  return response.text;
+};
 
 const extractArticle = async (articleId: string) => {
   const articleUrl = `${BASE_EXTRACTION_URL}/${articleId}`;

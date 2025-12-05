@@ -23,16 +23,30 @@
       <div>Loading article abstract</div>
       }
 
-      @if (abstractQuery.data()) {
-        <div>Abstract</div>
-        <div>
-          {{ abstractQuery.data() }}
-        </div>
-      }
-
       @if (abstractQuery.error()) {
         <div>Error displaying abstract</div>
       }
+
+      @if (abstractQuery.data(); as data) {
+        <div>Abstract</div>
+        <div>
+          {{ data }}
+        </div>
+
+        <input [(ngModel)]="questionText" placeholder="Ask something about this abstract" />
+        <button (click)="askAbstractQuestion(data)">Ask</button>
+        @if (chatMutation.isPending()) {
+          <div>Loading</div>
+        } @else if (chatMutation.isError()) {
+          <div>Error displaying AI response</div>
+        } @else {
+          <div>{{ chatMutation.data() }}</div>
+        }
+        <p *ngIf="chatMutation.data()" class="ai-response">
+              <strong>Gemini:</strong> {{ chatMutation.data() }}
+        </p>
+      }
+
     }
 
 </div>

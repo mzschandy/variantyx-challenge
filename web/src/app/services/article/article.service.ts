@@ -18,9 +18,7 @@ export class ArticleService {
   }
 
   public getAbstractByArticleId = async (articleId: string) => {
-    console.log('article id to be searched', articleId);
     const response = await axios<Abstract>(`${this.apiUrl}/articles/${articleId}`)
-    console.log('get abstract by article id response', response.data);
     return response.data;
   }
 }

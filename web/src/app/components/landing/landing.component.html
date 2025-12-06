@@ -1,52 +1,67 @@
-<div>
-    @if (articlesQuery.isLoading()) {
-      <div>Loading articles...</div>
-    }
-
-    @if (articlesQuery.error()) {
-      <div>Error displaying articles</div>
-    }
-
-    @for (article of articlesQuery.data(); track article.id) {
-        <div class="article">
-          <div class="article-title">{{article.pubmed_id}}</div>
-          <div class="button">
-            <button (click)="selectArticleId(article.pubmed_id)">View article abstract</button>
+<div class="max-h-screen max-w-screen grid grid-cols-4 gap-4 p-4">
+    <div class="lister rounded-md border">
+      @if (articlesQuery.error()) {
+        <div>Error displaying articles</div>
+      } @else if (articlesQuery.isLoading()) {
+        <div class="flex justify-center items-center h-full">
+          <hlm-spinner class="text-xl" />
+        </div>
+      }
+      <ng-scrollbar hlm>
+        <div class="p-4 flex flex-col gap-4 whitespace-nowrap max-h-screen overflow-y-scroll" scrollViewport>
+          @for (article of articlesQuery.data(); track article.id) {
+            <app-article-item [articleId]="article.pubmed_id" (selectArticle)="selectArticleEvent($event)"></app-article-item>
+          }
+        </div>
+      </ng-scrollbar>
+    </div>
+    <div class="panel col-span-3 justify-center p-4 rounded-md border">
+      @if (selectedPubMedId()) {
+        @if (abstractQuery.error()) {
+          <div>Error displaying abstract</div>
+        } @else if (abstractQuery.isLoading()) {
+          <div class="flex justify-center items-center h-full">
+            <hlm-spinner class="text-xl" />
           </div>
-        </div>
-    }
+        } @else if (abstractQuery.data(); as abstractData) {
+          <h3><strong>Abstract</strong></h3>
+          <div>
+            {{ abstractData }}
+          </div>
 
+          <div class="mt-4">
+            <div class="flex w-full items-center gap-2">
+			          <input class="w-full p-2" hlmInput [(ngModel)]="questionText" placeholder="And I couldn't help but wonder..." />
+			          <button hlmBtn variant="outline" (click)="askAbstractQuestion(abstractData)">
+                  @if (chatMutation.isPending()) {
+                    <hlm-spinner />
+                  } @else {
+                    Ask
+                  }
+                </button>
+		        </div>
+          </div>
 
-    @if (selectedPubMedId()) {
-
-      @if (abstractQuery.isLoading()) {
-      <div>Loading article abstract</div>
-      }
-
-      @if (abstractQuery.error()) {
-        <div>Error displaying abstract</div>
-      }
-
-      @if (abstractQuery.data(); as data) {
-        <div>Abstract</div>
-        <div>
-          {{ data }}
-        </div>
-
-        <input [(ngModel)]="questionText" placeholder="Ask something about this abstract" />
-        <button (click)="askAbstractQuestion(data)">Ask</button>
-        @if (chatMutation.isPending()) {
-          <div>Loading</div>
-        } @else if (chatMutation.isError()) {
-          <div>Error displaying AI response</div>
-        } @else {
-          <div>{{ chatMutation.data() }}</div>
+          <div class="mt-4 justify-center">
+            @if (chatMutation.isPending()) {
+              <div class="flex justify-center items-center h-full">
+                <hlm-spinner class="text-xl" />
+              </div>
+            } @else if (chatMutation.isError()) {
+              <div>Error displaying AI response</div>
+            } 
+            @if (chatMutation.data()) {
+              <div hlmAlert>
+			          <ng-icon hlm hlmAlertIcon name="lucideSparkles" />
+			          <p hlmAlertDescription>{{ chatMutation.data() }}</p>
+		          </div>
+            }
+          </div>
         }
-        <p *ngIf="chatMutation.data()" class="ai-response">
-              <strong>Gemini:</strong> {{ chatMutation.data() }}
-        </p>
+      } @else {
+        <div class="flex justify-center items-center h-full">
+          <div>No abstract to display</div>
+        </div>
       }
-
-    }
-
+    </div>
 </div>

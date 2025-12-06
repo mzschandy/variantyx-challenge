@@ -1,2 +1,3 @@
-# variantyx-challenge
+For performance, I implemented a simple cache using my database. Since scraping PubMed is a (relatively) expensive operation, I scrape once then save it to the database. On subsequent requests if the abstract exists in the database, we serve it from there. Otherwise, it gets scraped then saved.This was also which also ensures the app works even if PubMed goes down temporarily. There's no direct exposure client side as everything is ahndled via the server which is important for any potential client side attacks. Tanstack Query servers as the cache in the frontend and acts as the built in cache for any and all client side requests.
+
 

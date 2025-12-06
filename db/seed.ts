@@ -28,7 +28,6 @@ const seed = async () => {
       [article.type, article.id]
     );
   }
-  console.log('Seeding complete.');
 };
 
 seed();

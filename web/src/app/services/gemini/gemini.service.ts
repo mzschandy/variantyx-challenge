@@ -9,7 +9,6 @@ export class GeminiService {
 
   public askQuestion = async (payload: { abstract: string; question: string }) => {
     const response = await axios.post(`${this.apiUrl}/gemini/ask`, payload);
-    console.log('gemini repsonse', response.data);
     return response.data;
   }
 }

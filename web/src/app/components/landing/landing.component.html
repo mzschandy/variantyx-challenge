@@ -31,7 +31,7 @@
 
           <div class="mt-4">
             <div class="flex w-full items-center gap-2">
-			          <input class="w-full p-2" hlmInput [(ngModel)]="questionText" placeholder="And I couldn't help but wonder..." />
+			          <input class="w-full p-2" hlmInput [(ngModel)]="questionText" placeholder="Ask a quesiton about the abstract" />
 			          <button hlmBtn variant="outline" (click)="askAbstractQuestion(abstractData)">
                   @if (chatMutation.isPending()) {
                     <hlm-spinner />
